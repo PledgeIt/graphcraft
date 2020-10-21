@@ -1,13 +1,13 @@
 const _ = require('lodash');
 const { resolver, argsToFindOptions } = require('graphql-sequelize');
-const { EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize');
+const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize');
 const hooks = require('./hooks');
 const { getIncludes, getOrderBy } = require('../utils');
 const QUERY_TYPE = 'fetch';
 
 module.exports = (options) => {
 
-  const { dataloaderContext, limits, globalHooks, models } = options;
+  const { limits, globalHooks, models, dataloader } = options;
 
   return async (model, source, args, context, info, queryOptions) => {
 
@@ -18,6 +18,8 @@ module.exports = (options) => {
     const includes = getIncludes(simpleAST, realModel.name, models);
 
     // setup dataloader for resolver.
+    const dataloaderContext = dataloader ? createContext(models.sequelize) : null;
+
     resolver.contextToOptions = { [EXPECTED_OPTIONS_KEY]: EXPECTED_OPTIONS_KEY };
     context[EXPECTED_OPTIONS_KEY] = dataloaderContext;
 

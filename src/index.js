@@ -1,7 +1,6 @@
 const assert = require('assert');
 const cls = require('cls-hooked');
 const TRANSACTION_NAMESPACE = 'sequelize-graphql-schema';
-const { createContext } = require('dataloader-sequelize');
 const { define } = require('./utils');
 
 // library options
@@ -158,10 +157,6 @@ function generateSchema(options) {
   return (models, context) => {
     assert(models.Sequelize, 'Sequelize not found as models.Sequelize.');
     assert(models.sequelize, 'sequelize instance not found as models.sequelize.');
-
-    if (options.dataloader) {
-      options.dataloaderContext = createContext(models.sequelize);
-    }
 
     options.Sequelize = models.Sequelize;
     options.sequelize = models.sequelize;
