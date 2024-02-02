@@ -14,6 +14,7 @@ const {
   simplifyAST
 } = require('graphql-sequelize');
 const { sanitizeField, generateName, isAvailable, whereQueryVarsToValues } = require('../utils');
+const { createContext } = require('dataloader-sequelize');
 
 module.exports = (options) => {
 
@@ -119,15 +120,14 @@ module.exports = (options) => {
           description: `Fetch ${modelQueryName}.`,
           args: Object.assign(defaultArgs(model), defaultListArguments, includeArguments, paranoidType),
           resolve: (source, args, context, info) => {
-
             if (!isAvailable(exposeOnly.queries, [modelQueryName]) && exposeOnly.throw) {
               throw Error(exposeOnly.throw);
             }
 
             const simpleAST = simplifyAST(info.fieldASTs || info.fieldNodes, info).fields || {};
 
+            context.dataloaderContext = options.dataloader ? createContext(model.sequelize) : null;
             return query(model, source, args, context, info, { simpleAST });
-
           }
         };
       }

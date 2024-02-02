@@ -1,13 +1,13 @@
 const _ = require('lodash');
 const { resolver, argsToFindOptions } = require('graphql-sequelize');
-const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize');
+const { EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize');
 const hooks = require('./hooks');
 const { getIncludes, getOrderBy } = require('../utils');
 const QUERY_TYPE = 'fetch';
 
 module.exports = (options) => {
 
-  const { limits, globalHooks, models, dataloader } = options;
+  const { limits, globalHooks, models } = options;
 
   return async (model, source, args, context, info, queryOptions) => {
 
@@ -18,10 +18,8 @@ module.exports = (options) => {
     const includes = getIncludes(simpleAST, realModel.name, models);
 
     // setup dataloader for resolver.
-    const dataloaderContext = dataloader ? createContext(models.sequelize) : null;
-
     resolver.contextToOptions = { [EXPECTED_OPTIONS_KEY]: EXPECTED_OPTIONS_KEY };
-    context[EXPECTED_OPTIONS_KEY] = dataloaderContext;
+    context[EXPECTED_OPTIONS_KEY] = context.dataloaderContext;
 
     if (!isAssociation) {
       args.limit = args.limit || (limits.default !== 0 && limits.default) || undefined;
@@ -41,7 +39,9 @@ module.exports = (options) => {
     }
 
     // hook coming from graphql.before.fetch
-    const beforeHookResponse = await hooks.before(isAssociation ? model.target : model, source, args, context, info, QUERY_TYPE);
+    const beforeHookResponse = await hooks.before(isAssociation ? model.target : model, source, args, context, info, QUERY_TYPE, {
+      association: isAssociation ? model : null
+    });
 
     if (beforeHookResponse) {
       return beforeHookResponse;
@@ -72,7 +72,6 @@ module.exports = (options) => {
       }
 
       findOptions.gqlContext = context;
-
       return findOptions;
     };
 
