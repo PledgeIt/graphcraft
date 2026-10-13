@@ -51,8 +51,7 @@
     "dataloader-sequelize": "^2.2.0",
     "graphql-relay": "^0.7.0",
     "graphql-request": "^1.8.2",
-    "graphql-sequelize": "^9.4.0",
-    "uuid": "^3.3.2"
+    "graphql-sequelize": "^9.4.0"
   },
   "devDependencies": {
     "eslint": "^5.13.0",

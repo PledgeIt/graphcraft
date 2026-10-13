@@ -1,5 +1,5 @@
+const crypto = require('crypto');
 const _ = require('lodash');
-const uuid = require('uuid/v4');
 const hooks = require('./hooks');
 
 function findOneRecord(model, where) {
@@ -203,7 +203,7 @@ async function createMutation (graphqlParams, mutationOptions) {
   const { isBulk, modelTypeName, models, transaction, skipReturning } = mutationOptions;
   const model = models[modelTypeName];
   const { bulkColumn, returning } = Array.isArray(model.graphql.bulk) ? {} : model.graphql.bulk;
-  const bulkIdentifier = uuid();
+  const bulkIdentifier = crypto.randomUUID();
   let input = args[modelTypeName];
 
   if (isBulk) {
