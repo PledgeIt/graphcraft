@@ -22,8 +22,13 @@ module.exports = (options) => {
     context[EXPECTED_OPTIONS_KEY] = context.dataloaderContext;
 
     if (!isAssociation) {
+      // maxLimit is never declared in the schema, so only server code that calls this resolver can set it.
+      const modelMax = graphql.maxLimit !== undefined ? graphql.maxLimit : limits.max;
+      const max = args.maxLimit !== undefined ? args.maxLimit : modelMax;
+      delete args.maxLimit;
+
       args.limit = args.limit || (limits.default !== 0 && limits.default) || undefined;
-      args.limit = (limits.max !== 0 && args.limit > limits.max) ? limits.max : args.limit;
+      args.limit = (max !== 0 && args.limit > max) ? max : args.limit;
     }
 
     // No need to call authorizer again on associations

@@ -61,6 +61,12 @@ limits: {
   nested: false // whether to apply these limits on nested/sub types or not
 }
 ```
+A model can set `graphql.maxLimit` to replace `limits.max` for its find queries.
+
+A custom resolver that calls a generated find resolver can pass `maxLimit` in `args` to replace both for that call. The schema does not declare `maxLimit`, so clients cannot send it.
+```javascript
+info.parentType.getFields().findCampaigns.resolve({}, { ...args, maxLimit: 1000 }, context, info);
+```
 ```javascript
 // nested objects can be passed and will be mutated automatically. Only hasMany and belongsTo relation supported.
 nestedMutations: true, // doesn't work with add bulk mutation
